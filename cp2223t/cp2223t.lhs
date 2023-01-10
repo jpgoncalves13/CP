@@ -209,6 +209,7 @@ import Data.List.Split hiding (split,chunksOf)
 import Svg hiding (for,wrap)
 import Control.Concurrent
 import Cp2223data
+import Control.Monad (when)
 
 main = undefined
 instance Strong Dist
@@ -1358,11 +1359,16 @@ wrap = p2
 \subsection*{Problema 2}
 Gene de |tax|:
 \begin{code}
-gene = undefined
+gene = (id -|- (id >< groupBy (\x y -> take 4 y == "    ") . map (drop 4))) . out
+
 \end{code}
 Função de pós-processamento:
 \begin{code}
-post = undefined
+post = cataExp gnp
+
+gnp = either gnp1 gnp2
+    where gnp1 x = [[x]] 
+          gnp2 (x,l) = [x] : map (x:) (concat l)
 \end{code}
 
 \subsection*{Problema 3}
