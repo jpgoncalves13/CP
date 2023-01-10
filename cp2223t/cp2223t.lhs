@@ -159,15 +159,13 @@
 
 \begin{center}\large
 \begin{tabular}{ll}
-Grupo nr. & 99 (preencher)
+Grupo nr. & 05
 \\\hline
-a11111 & Nome1 (preencher)
+a96215 & João Martins
 \\
-a22222 & Nome2 (preencher)
+a97541 & Gonçalo Braga
 \\
-a33333 & Nome3 (preencher)
-\\
-a44444 & Nome4 (preencher, se aplicável)
+a95019 & João Gonçalves
 \end{tabular}
 \end{center}
 
