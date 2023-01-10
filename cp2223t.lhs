@@ -1115,9 +1115,6 @@ simples e elegantes.
 
 \subsection*{Problema 1}
 
-\subsection*{Problema 1}
-
-
 \begin{spec}
 f a b c 0 = 0
 f a b c 1 = 1
