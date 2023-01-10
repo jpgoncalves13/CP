@@ -104,7 +104,7 @@ lsplit l   = i2 (sep l) where
      sep []    = ([],[])
      sep (h:t) = let (l,r) = sep t in (h:r,l)  -- a List cata
 
-{-- pointwcoise version:
+{-- pointwise version:
 
 mSort :: Ord a => [a] -> [a]
 mSort [] = []
