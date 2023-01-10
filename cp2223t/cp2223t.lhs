@@ -1116,10 +1116,244 @@ Valoriza-se a escrita de \emph{pouco} código que corresponda a soluções
 simples e elegantes.
 
 \subsection*{Problema 1}
+
+
+\begin{spec}
+f a b c 0 = 0
+f a b c 1 = 1
+f a b c 2 = 1
+f a b c (n+3) = a * f a b c (n+2) + b * f a b c (n+1) + c * f a b c n
+\end{spec}
+
+De modo a resolver o primeiro problema, definimos duas funções auxiliares:
+
+\begin{spec}
+g a b c n = f a b c (n+1)
+
+j a b c n = f a b c (n+2)
+\end{spec}
+
+E podemos relacionar a função |g| com a função |j|:
+
+\begin{spec}
+j a b c n = g a b c (n+1) = f a b c (n+2)
+\end{spec}
+
+Logo, possuímos a seguinte recursividade mútua:
+
+\begin{eqnarray*}
+\begin{cases}
+      \begin{cases}
+        |j a b c 0 = 1|\\
+        |j a b c (n+1) = a * j a b c n + b * g a b c n + c * f a b c n|
+      \end{cases}\\
+      \begin{cases}
+        |g a b c 0 = 1|\\  
+        |g a b c (n+1) = j a b c n| 
+      \end{cases}\\
+      \begin{cases}
+        |f a b c 0 = 0|\\
+        |f a b c (n+1) = g a b c n|
+      \end{cases}
+\end{cases}
+\end{eqnarray*}
+
+Através da lei da recursividade mútua, para os naturais, sabemos que: 
+
+\begin{eqnarray*}
+\start  \begin{cases}
+            \begin{cases}
+              |(j a b c) . (const 0) = (const 1)|\\
+              |(j a b c) . succ = add . split (add . split ((a*) . p1 . p1 ) ((b*) . p2 . p1)) ((c*) . p2)  . split (split (j a b c) (g a b c)) (f a b c)|
+            \end{cases}\\
+            \begin{cases}
+              |(g a b c) . (const 0) = (const 1)|\\
+              |(g a b c) . succ = p1 . p1 . split (split (j a b c) (g a b c)) (f a b c)|
+            \end{cases}\\
+            \begin{cases}
+              |(f a b c) . (const 0) = (const 0)|\\
+              |(f a b c) . succ = p2 . p1 . split (split (j a b c) (g a b c)) (f a b c)|
+            \end{cases}
+        \end{cases}
+%
+\just\equiv{ 3x Eq-+; 3x Fusao-+ }
+%
+\begin{cases}
+  |(j a b c) . either (const 0) succ = either (const 1)  (add . split (add . split ((a*) . p1 . p1 ) ((b*) . p2 . p1)) ((c*) . p2)  . split (split (j a b c) (g a b c)) (f a b c))|\\
+  |(g a b c) . either (const 0) succ = either (const 1) (p1 . p1 . split (split (j a b c) (g a b c)) (f a b c))|\\
+  |(f a b c) . either (const 0) succ = either (const 0) (p2 . p1 . split (split (j a b c) (g a b c)) (f a b c))|
+\end{cases}
+%
+\just\equiv{ Defenição de in; Natural-id }
+%
+\begin{cases}
+  |(j a b c) . in = either ((const 1) . id)  (add . split (add . split ((a*) . p1 . p1 ) ((b*) . p2 . p1)) ((c*) . p2)  . split (split (j a b c) (g a b c)) (f a b c))|\\
+  |(g a b c) . in = either ((const 1) . id) (p1 . p1 . split (split (j a b c) (g a b c)) (f a b c))|\\
+  |(f a b c) . in = either ((const 0) . id) (p2 . p1 . split (split (j a b c) (g a b c)) (f a b c))|       
+\end{cases}
+%
+\just\equiv{ 3x Absorção-+ }
+%
+\begin{cases}
+  |(j a b c) . in = (either (const 1)  (add . split (add . split ((a*) . p1 . p1 ) ((b*) . p2 . p1)) ((c*) . p2))) . 1 + split (split (j a b c) (g a b c)) (f a b c)|\\
+  |(g a b c) . in = (either (const 1) (p1 . p1)) . 1 + split (split (j a b c) (g a b c)) (f a b c)|\\
+  |(f a b c) . in = (either (const 0) (p2 . p1)) . 1 + split (split (j a b c) (g a b c)) (f a b c)|
+\end{cases}
+%
+\just\equiv{ Fokkinga }
+%
+|split (split (j a b c) (g a b c)) (f a b c) = cata (split(split (either (const 1)  (add . split (add . split ((a*) . p1 . p1 ) ((b*) . p2 . p1)) ((c*) . p2))) (either (const 1) (p1 . p1))) (either (const 0) (p2 . p1)))|
+\qed
+\end{eqnarray*}
+
+Mostrando assim que a podemos escrever a função |f| a partir de um catamorfismo. Como obtemos o catamorfismo, podemos 
+converter para um ciclo for de acordo com a definição:
+
+\begin{spec}
+for b i = cata (either (const i) b)
+\end{spec}
+
+Assim sendo:
+
+\begin{eqnarray*}
+\start
+|cata (split (split (either (const 1)  (add . split (add . split ((a*) . p1 . p1 ) ((b*) . p2 . p1)) ((c*) . p2))) (either (const 1) (p1 . p1))) (either (const 0) (p2 . p1)))|
+%
+\just\equiv{ Lei da troca }
+%
+|cata (split (either (split (const 1) (const 1)) (split (add . split (add . split ((a*) . p1 . p1 ) ((b*) . p2 . p1)) ((c*) . p2)) (p1 . p1))) (either (const 0) (p2 . p1)))|
+%
+\just\equiv{ Lei da troca }
+%
+|cata (either (split (split (const 1) (const 1)) (const 0)) (split (split (add . split (add . split ((a*) . p1 . p1 ) ((b*) . p2 . p1)) ((c*) . p2)) (p1 . p1)) (p2 . p1)))|
+\qed
+\end{eqnarray*}
+
+Para sabermos o valor de inicialização do ciclo, igualamos a seguinte expressão:
+
+\begin{eqnarray*}
+\start
+| const i = split (split (const 1) (const 1)) (const 0)|
+%
+\just\equiv{ Universal-x }
+% 
+|lcbr(
+  p1 . (const i) = split (const 1) (const 1)
+)(
+  p2 . (const i) = (const 0)
+)|
+%
+\just\equiv{ Universal-x; Fusão-const }
+%
+|lcbr(
+  lcbr(
+    p1 . p1 . (const i) = (const 1)
+  )(
+    p2 . p1 . (const i) = (const 1)
+  )
+)(
+  const (p2 . i) = const 0
+)|
+%
+\just\equiv{ 2x Fusão-const; |(const a) = (const b)| se |a=b|}
+%
+|lcbr(
+  lcbr(
+    const (p1 . p1 . i) = (const 1)
+  )(
+    const (p2 . p1 . i) = (const 1)
+  )
+)(
+  p2 . i = 0
+)|
+%
+\just\equiv{ 2x |(const a) = (const b)| se |a=b|}
+%
+|lcbr(
+  lcbr(
+    p1 . p1 . i = 1
+  )(
+    p2 . p1 . i = 1
+  )
+)(
+  p2 . i = 0
+)|
+%
+\just\equiv{ Universal-x }
+%
+|lcbr(
+  p1 . i = (1,1)
+)(
+  p2 . i = 0
+)|
+%
+\just\equiv{ Universal-x }
+%
+|i = ((1,1),0)|
+\qed
+\end{eqnarray*}
+
+Obtendo o |initial|.
+
+Para apresentarmos a função do corpo do ciclo de forma mais amigável à preceção do utilizar vamos passá-la para a notação \emph{point wise}, introduzindo variàveis: 
+
+\begin{eqnarray*}
+\start
+|(split (split (add . split (add . split ((a*) . p1 . p1 ) ((b*) . p2 . p1)) ((c*) . p2)) (p1 . p1)) (p2 . p1)) ((h,k),l)|
+%
+\just\equiv{ Def-split }
+% 
+|(split (add . split (add . split ((a*) . p1 . p1 ) ((b*) . p2 . p1)) ((c*) . p2)) (p1 . p1) ((h,k),l), (p2 . p1) ((h,k),l) )|
+%
+\just\equiv{ Def-split; Def-comp }
+% 
+|((add . split (add . split ((a*) . p1 . p1 ) ((b*) . p2 . p1)) ((c*) . p2) ((h,k),l), (p1 . p1) ((h,k),l) ), p2 ( p1 ((h,k),l) ) ) |
+%
+\just\equiv{ 2x Def-comp; Def-proj }
+% 
+|((add ((split (add . split ((a*) . p1 . p1 ) ((b*) . p2 . p1)) ((c*) . p2) ((h,k),l) )), p1 ( p1 ((h,k),l) ) ), p2 (h,k) ) |
+%
+\just\equiv{ Def-split; 2x Def-proj }
+% 
+|((add ( add . split ((a*) . p1 . p1 ) ((b*) . p2 . p1) ((h,k),l), ((c*) . p2) ((h,k),l) ), p1 (h,k) ), k ) |
+%
+\just\equiv{ 2x Def-comp; Def-proj }
+% 
+|((add ( add ( ((a*) . p1 . p1 ) ((h,k),l), ((b*) . p2 . p1) ((h,k),l)), (c*) (p2 (h,l)) ), h ), k ) |
+%
+\just\equiv{ 2x Def-comp; Def-proj }
+% 
+|((add ( add ( ((a*) . p1) ( p1 ((h,k),l)), ((b*) . p2) ( p1 ((h,k),l))), (c*) l ), h ), k ) |
+%
+\just\equiv{ 2x Def-proj; Definição de |*| }
+% 
+|((add ( add ( ((a*) . p1) (h,k), ((b*) . p2) (h,k)), c * l ), h ), k ) |
+%
+\just\equiv{ 2x Def-comp }
+% 
+|((add ( add ( (a*) ( p1 (h,k)), (b*) ( p2 (h,k))), c * l ), h ), k ) |
+%
+\just\equiv{ 2x Def-proj }
+% 
+|((add ( add ( (a*) h, (b*) k), c * l ), h ), k ) |
+%
+\just\equiv{ 2x Definição de |*| }
+% 
+|((add ( add ( a * h, b * k), c * l ), h ), k ) |
+%
+\just\equiv{ Definição de |add| }
+% 
+|((add ( a * h + b * k, c * l ), h ), k ) |
+\just\equiv{ Definição de |add| }
+% 
+|((a * h + b * k + c * l , h ), k ) |
+\qed
+\end{eqnarray*}
+
 Funções auxiliares pedidas:
 \begin{code}
-loop = undefined
-initial = undefined
+loop a b c ((j,g),f) = ((a*j+b*g+c*f,j),g)
+initial = ((1,1),0)
 wrap = p2
 \end{code}
 
