@@ -210,6 +210,7 @@ import Svg hiding (for,wrap)
 import Control.Concurrent
 import Cp2223data
 import Control.Monad (when)
+import qualified BTree
 
 main = undefined
 instance Strong Dist
@@ -1116,7 +1117,6 @@ simples e elegantes.
 
 \subsection*{Problema 1}
 
-
 \begin{spec}
 f a b c 0 = 0
 f a b c 1 = 1
@@ -1357,18 +1357,111 @@ wrap = p2
 \end{code}
 
 \subsection*{Problema 2}
-Gene de |tax|:
+
+De forma a resolvermos o problema 2 é necessário recorrer ao seguinte diagrama de um anamorfismo:
+
+\begin{eqnarray*}
+\xymatrix{
+  |Exp S S| & & S + S \times (|Exp S S|)^*\ar[ll]_{|inExp|} \\
+  S^*\ar@@/_1.5pc/[rr]_{|gene|}\ar[r]^(0.35){|out|}\ar[u]^{|tax|} & S + S \times S^*\ar[r]^(0.45){\cdots} & S + S \times (S^*)^*\ar[u]_{id + id \times tax^*}
+}
+\end{eqnarray*}
+
+O gene será uma a composição de duas funções, a |out| e um função que é um |either|.
+Para podermos definir as duas componentes do |either| é necessário perceber o resultado da função |out|.
+A função |out| é o |out| das listas não vazias. No caso da lista só com um elemento,
+esse é etiquetado à esquerda e neste caso aplicamos a função identidade, visto que, este elemento será uma variável na árvore de expressões.
+No caso da lista com mais de um elemento divide a cabeça e a causa e o par é etiquetado à direita.
+Para facilidade da interpertar o raciocínio apresentamos, através de um caso específico, como fica a saída:
+
+\begin{spec}
+("CCS",["    General and reference",
+        "        Document types",
+        "            Surveys and overviews",
+        "            Reference works",
+        "            General conference proceedings",
+        "            Biographies",
+        "            General literature",
+        "            Computing standards, RFCs and guidelines",
+        "        Cross-computing tools and techniques"])
+\end{spec}
+
+Neste segundo caso na cabeça ficará o primeiro elemento da lista, ou seja, a |String| não identada que é um operador, à qual basta aplicar a função identidade.
+Na cauda da lista ficam as |String| com identação. Para remover a identação é necessário remover os 4 espaços 
+de todos os elementos e para isso usamos a função |map (take 4)| ficando o par da seguinte forma:
+
+\begin{spec}
+("CCS",["General and reference",
+        "    Document types",
+        "        Surveys and overviews",
+        "        Reference works",
+        "        General conference proceedings",
+        "        Biographies",
+        "        General literature",
+        "        Computing standards, RFCs and guidelines",
+        "    Cross-computing tools and techniques"])
+\end{spec}
+
+Em seguida é necessário dividir esta lista em sublistas, ou seja, fazer um agrupamento.
+Cada lista nova terá a cabeça, ou seja, a |String| sem identação e as |String| com hierarquia inferior a esta, com identação.  
+Para isso usamos a seguinte função:
+
+  groupBy ($\backslash$x y = take 4 y == ``\hspace{1cm}'')
+
+
+Esta condição permite que sejam geradas as lista da forma pretendida, visto que, a função groupBy mantem uma lista atual e faz a comparação do último elemento da lista atual com o próximo elemento da lista,
+se é verificada adiciona o elemento à lista atual, caso contrário insere a lista atual na lista de sublistas e adiciona uma nova lista atual com este elemento.
+Logo, no nosso caso em especifico:
+
+\begin{spec}
+("CCS",[["General and reference",
+        "    Document types",
+        "        Surveys and overviews",
+        "        Reference works",
+        "        General conference proceedings",
+        "        Biographies",
+        "        General literature",
+        "        Computing standards, RFCs and guidelines",
+        "    Cross-computing tools and techniques"]])
+\end{spec}
+
+Assim sendo, o gene de |tax|:
 \begin{code}
 gene = (id -|- (id >< groupBy (\x y -> take 4 y == "    ") . map (drop 4))) . out
-
 \end{code}
-Função de pós-processamento:
+
+A função de pós-processamento pode ser definida através de um catamorfismo com o seguinte diagrama:
+
+\begin{eqnarray*}
+\xymatrix@@C=3cm{
+    |Exp S S|
+           \ar[d]_-{|cataExp g|}
+&
+    S + S \times (|Exp S S|)^*
+           \ar[d]^{|id + id| \times |(cataExp g)|}
+           \ar[l]_-{|inExp|}
+\\
+     (S^*)^*
+&
+     S + S \times ((S^*)^*)^*
+           \ar[l]^-{|gnp|}
+}
+\end{eqnarray*}
+
+Depois de identificarmos o catamorfismo de árvores de expressão, passamos à fase de identificar qual o seu gene.  
+No caso do lado esquerdo apenas precisamos de colocar a |String| dentro de uma lista e esta dentro de outra lista. 
+No caso do lado direito é necessário perceber qual é o resultado do lado direito do par, que são as listas com os caminhos que é possível tomar a partir da |String| do lado esquerdo do par.   
+Assim sendo, necessitamos de introduzir à cabeça de cada um desses caminhos a |String| do lado esquerdo. 
+Para isso, primeiro a lista com as listas dos caminhos são concatenadas para possuírmos a lista com os caminhos.   
+Em seguida, acrescentamos à cabeça de todos os caminhos a |String| do lado esquerdo e acrescentamos mais um caminho para que seja possível chegar ao nível desta |String|, visto que queremos todos os caminhos da árvore.   
+
+Culminando na função de pós-processamento:
 \begin{code}
 post = cataExp gnp
+  where gnp = either gnp1 gnp2
+        gnp1 x = [[x]]
+        gnp2 (x,l) = [x] : map (x:) (concat l)
 
-gnp = either gnp1 gnp2
-    where gnp1 x = [[x]] 
-          gnp2 (x,l) = [x] : map (x:) (concat l)
 \end{code}
 
 \subsection*{Problema 3}
