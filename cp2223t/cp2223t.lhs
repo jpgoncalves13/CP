@@ -1465,18 +1465,53 @@ post = cataExp gnp
 \end{code}
 
 \subsection*{Problema 3}
+Para resolvermos o problema número 3 nós começamos por descobrir o gene do catamorfismo rose2List, sendo assim obtivemos o seguinte diagrama:
+\begin{eqnarray*}
+\xymatrix@@C=3cm{
+    |Rose A|
+           \ar[d]_-{|cataRose gr2l|}
+&
+    A \times (|Rose A|)^*
+           \ar[d]^{|(RecRose (cataRose gr2l))|}
+           \ar[l]_-{|inRose|}
+\\
+     A^*
+&
+     A \times (A^*)^*
+           \ar[l]^-{|gr2l|}
+}
+\end{eqnarray*}
+Tendo em conta o diagrama apresentado podemos reparar que o único ponto de falha existente na função é no cálculo do seu gene uma vez que tudo o resto já se encontra 
+devidamente definido. 
+Tendo em atenção aos tipos de entrada e de saída que o gene possui, conseguimos perceber claramente qual o trabalho desenvolvido por este. 
+
+Se repararmos o gene recebe um par constituído pela cabeça de uma lista, de tipo A, e uma lista de listas com elementos do tipo A. 
+O gene devolve apenas uma lista,com elementos do tipo A.
+
+Sendo assim conseguimos perceber que o gene irá ter de concatenar a lista de listas, formando apenas uma lista e colocando o elemento A á cabeça da lista criada.
+
+Com base nesta explicação do diagrama conseguimos perceber que a função rose2List pode ser definida da seguinte forma:
 \begin{code}
-squares = anaRose gsq
-
-gsq = undefined
-
 rose2List = cataRose gr2l 
 
-gr2l = undefined
+gr2l (a,l)=a:concat l
+\end{code}
+\begin{code}
 
-carpets = undefined
+squares = anaRose gsq
 
-present = undefined
+gsq = split gsq1 gsq2
+  where gsq1 (((x,y),z),w) =((x+z/3,y+z/3),z/3)
+        gsq2 (((x,y),z),w) = if w>0 then [(((x,y),z/3),w-1),  (((x+z/3,y),z/3),w-1),  (((x+(2*z/3),y),z/3),w-1), (((x,y+z/3),z/3),w-1),(((x+2*z/3,y+z/3),z/3),w-1), (((x,y+2*z/3),z/3),w-1), (((x+z/3,y+2*z/3),z/3),w-1) , (((x+2*z/3,y+2*z/3),z/3),w-1)] 
+                             else []
+
+
+carpets :: Int ->[[Square]]
+carpets 0 = []
+carpets n =carpets (n-1) ++ [sierpinski(((0,0),32),n-1)]
+
+present :: [[Square]] -> IO [()]
+present = mmap ($\$ l -> do {drawSq l;await})
 \end{code}
 
 \subsection*{Problema 4}
