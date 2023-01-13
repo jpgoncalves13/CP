@@ -1665,6 +1665,24 @@ cgene = either cgene1 cgene2
                          else (a1,b1) : cgene2 ((a,b), l)
 \end{code}
 
+O diagrama representativo do catamorfismo utilizado na função consolidate' é o seguinte:
+
+\begin{eqnarray*}
+\xymatrix@@C=3cm{
+    (S \times N)^*
+           \ar[d]_-{|cataList cgene|}
+&
+    1 + (S \times N) + (S \times N)^*
+           \ar[d]^{|id| + |id| \times |cataList cgene|}
+           \ar[l]_-{|inList|}
+\\
+     (S \times N)^*
+&
+     1 + (S \times N) \times (S \times N)^*
+           \ar[l]^-{|cgene|}
+}
+\end{eqnarray*}
+
 Geração dos jogos da fase de grupos:
 
 Para decidir quem é o vencedor de um determinado jogo, tivemos de definir a função matchResult, que recebe como
