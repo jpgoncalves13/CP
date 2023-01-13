@@ -1481,7 +1481,7 @@ Para resolvermos o hilomorfismo abordado anteriormente, nós começamos por desc
            \ar[d]_-{|cataRose gr2l|}
 &
     A \times (|Rose A|)^*
-           \ar[d]^{|(RecRose (cataRose gr2l))|}
+           \ar[d]^{|id| \times |cataRose gr2l|}
            \ar[l]_-{|inRose|}
 \\
      A^*
@@ -1511,7 +1511,7 @@ ao anamorfismo é o seguinte:
 \begin{eqnarray*}
 \xymatrix{
   |Rose Square| & & Square \times (|Rose Square|)^*\ar[ll]_{|inRose|} \\
-  (Square,N_0)\ar@@/_1.5pc/[rr]_{|gsq|}\ar[r]^(0.55){|outNat.p2|}\ar[u]^{|anaRose gsq|} & 1+(N_0)\ar[r]^(0.35){\cdots} & Square\times (Square,N_0)^*\ar[u]_{|(RecRose (cataRose gr2l))|}
+  Square \times N_0\ar@@/_1.5pc/[rr]_{|gsq|}\ar[r]^(0.55){|outNat.p2|}\ar[u]^{|anaRose gsq|} & 1+(N_0)\ar[r]^(0.35){\cdots} & Square \times (Square,N_0)^*\ar[u]_{|id| \times |map(cataRose gr2l)|}
 }
 \end{eqnarray*}
 Visualizando o diagrama do anamorfismo, conseguimos perceber que apenas temos de calcular o gene do anamorfismo. 
@@ -1602,11 +1602,12 @@ Para isso, tivemos de definir o gene do catamorfismo que está indicado em baixo
 Gene de |consolidate'|:
 
 \begin{code}
-cgene = either c1 c2
-c1 = nil
-c2 ((a,b), []) = [(a,b)]
-c2 ((a,b), (a1,b1):t) = if a == a1 then (a1,b1+b) : t
-                        else (a1,b1) : c2 ((a,b),t)
+cgene :: (Eq a, Num b) => Either () ((a, b), [(a, b)])-> [(a, b)]
+cgene = either cgene1 cgene2
+  where cgene1 = nil
+        cgene2 ((a,b), []) = [(a,b)]
+        cgene2 ((a,b), (a1,b1) : l) = if a == a1 then (a,b+b1) : l
+                         else (a1,b1) : cgene2 ((a,b), l)
 \end{code}
 
 Geração dos jogos da fase de grupos:
@@ -1636,7 +1637,8 @@ O gene encontra-se definido em baixo.
 \begin{code}
 glt :: Eq a => [a] -> Either a ([a], [a])
 glt [x] = i1 x
-glt l = i2 splitAt n l where n = div (length l) 2
+glt l = i2 (splitAt n l)
+       where n = div (length l) 2
 \end{code}
 
 O diagrama representativo do anamorfismo utilizado na função initKnockoutStage é o seguinte:
