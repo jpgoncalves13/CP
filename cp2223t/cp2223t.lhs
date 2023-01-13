@@ -1,5 +1,3 @@
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-{-# HLINT ignore "Use tuple-section" #-}
 \documentclass[a4paper]{article}
 \usepackage[a4paper,left=3cm,right=2cm,top=2.5cm,bottom=2.5cm]{geometry}
 \usepackage[sfdefault, book, lf]{FiraSans} % lf - lined numbers
@@ -1467,65 +1465,65 @@ post = cataExp gnp
 \end{code}
 
 \subsection*{Problema 3}
-% A primeira parte do problema 3 consiste no cálculo dos gene das funções rose2List e squares. 
+A primeira parte do problema 3 consiste no cálculo dos gene das funções rose2List e squares. 
 
-% Estes dois genes quando compostos formam o seguinte hilomorfismo:
+Estes dois genes quando compostos formam o seguinte hilomorfismo:
 
-% \begin{spec} 
-% sierpinski :: (Square, Int) -> [Square]
-% sierpinski = hyloRose gr2l  gsq
-% \end{spec}
+\begin{spec} 
+sierpinski :: (Square, Int) -> [Square]
+sierpinski = hyloRose gr2l  gsq
+\end{spec}
 
-% Para resolvermos o hilomorfismo abordado anteriormente, nós começamos por descobrir o gene do catamorfismo rose2List.Sendo assim obtivemos o seguinte diagrama:
-% \begin{eqnarray*}
-% \xymatrix@@C=3cm{
-%     |Rose A|
-%            \ar[d]_-{|cataRose gr2l|}
-% &
-%     A \times (|Rose A|)^*
-%            \ar[d]^{|(RecRose (cataRose gr2l))|}
-%            \ar[l]_-{|inRose|}
-% \\
-%      A^*
-% &
-%      A \times (A^*)^*
-%            \ar[l]^-{|gr2l|}
-% }
-% \end{eqnarray*}
-% Tendo em conta o diagrama apresentado podemos reparar que o único ponto de falha existente na função é no cálculo do seu gene uma vez que tudo o resto já se encontra 
-% devidamente definido. 
-% Tendo em atenção aos tipos de entrada e de saída que o gene possui, conseguimos perceber claramente qual o trabalho desenvolvido por este. 
+Para resolvermos o hilomorfismo abordado anteriormente, nós começamos por descobrir o gene do catamorfismo rose2List.Sendo assim obtivemos o seguinte diagrama:
+\begin{eqnarray*}
+\xymatrix@@C=3cm{
+    |Rose A|
+           \ar[d]_-{|cataRose gr2l|}
+&
+    A \times (|Rose A|)^*
+           \ar[d]^{|(RecRose (cataRose gr2l))|}
+           \ar[l]_-{|inRose|}
+\\
+     A^*
+&
+     A \times (A^*)^*
+           \ar[l]^-{|gr2l|}
+}
+\end{eqnarray*}
+Tendo em conta o diagrama apresentado podemos reparar que o único ponto de falha existente na função é no cálculo do seu gene uma vez que tudo o resto já se encontra 
+devidamente definido. 
+Tendo em atenção aos tipos de entrada e de saída que o gene possui, conseguimos perceber claramente qual o trabalho desenvolvido por este. 
 
-% Se repararmos o gene recebe um par constituído pela cabeça de uma lista, de tipo A, e uma lista de listas com elementos do tipo A. 
-% O gene devolve apenas uma lista,com elementos do tipo A.
+Se repararmos o gene recebe um par constituído pela cabeça de uma lista, de tipo A, e uma lista de listas com elementos do tipo A. 
+O gene devolve apenas uma lista,com elementos do tipo A.
 
-% Sendo assim conseguimos perceber que o gene irá ter de concatenar a lista de listas, formando apenas uma lista e colocando o elemento A á cabeça da lista criada.
+Sendo assim conseguimos perceber que o gene irá ter de concatenar a lista de listas, formando apenas uma lista e colocando o elemento A á cabeça da lista criada.
 
-% Com base nesta explicação do diagrama conseguimos perceber que a função rose2List pode ser definida da seguinte forma:
+Com base nesta explicação do diagrama conseguimos perceber que a função rose2List pode ser definida da seguinte forma:
 \begin{code}
 rose2List = cataRose gr2l 
 
 gr2l (a,l)=a:concat l
 \end{code}
 
-% Tal como aconteceu para o cálculo do gene do catamorfismo, adotamos a mesma estratégia para o cálculo do gene do anamorfismo. Sendo assim o diagrama que corresponde
-% ao anamorfismo é o seguinte:
-% \begin{eqnarray*}
-% \xymatrix{
-%   |Rose Square| & & Square \times (|Rose Square|)^*\ar[ll]_{|inRose|} \\
-%   (Square,N_0)\ar@@/_1.5pc/[rr]_{|gsq|}\ar[r]^(0.55){|outNat.p2|}\ar[u]^{|anaRose gsq|} & 1+(N_0)\ar[r]^(0.35){\cdots} & Square\times (Square,N_0)^*\ar[u]_{|(RecRose (cataRose gr2l))|}
-% }
-% \end{eqnarray*}
-% Visualizando o diagrama do anamorfismo, conseguimos perceber que apenas temos de calcular o gene do anamorfismo. 
-% Sendo assim, se repararmos no diagrama do anamorfismo, o gene recebe um par composto por (Square,N0) e tem de devolver um par composto por 
-% uma square e uma lista composta por (Square,N_0) . 
+Tal como aconteceu para o cálculo do gene do catamorfismo, adotamos a mesma estratégia para o cálculo do gene do anamorfismo. Sendo assim o diagrama que corresponde
+ao anamorfismo é o seguinte:
+\begin{eqnarray*}
+\xymatrix{
+  |Rose Square| & & Square \times (|Rose Square|)^*\ar[ll]_{|inRose|} \\
+  (Square,N_0)\ar@@/_1.5pc/[rr]_{|gsq|}\ar[r]^(0.55){|outNat.p2|}\ar[u]^{|anaRose gsq|} & 1+(N_0)\ar[r]^(0.35){\cdots} & Square\times (Square,N_0)^*\ar[u]_{|(RecRose (cataRose gr2l))|}
+}
+\end{eqnarray*}
+Visualizando o diagrama do anamorfismo, conseguimos perceber que apenas temos de calcular o gene do anamorfismo. 
+Sendo assim, se repararmos no diagrama do anamorfismo, o gene recebe um par composto por (Square,N0) e tem de devolver um par composto por 
+uma square e uma lista composta por (Square,N_0) . 
 
-% Com base no que foi dito anteriormente, conseguimos perceber que o gene tem de devolver uma square caso o natural seja igual a 0, ou então, devolve uma lista
-% de pares (Square,N0) caso o N0 seja diferente de 0. 
+Com base no que foi dito anteriormente, conseguimos perceber que o gene tem de devolver uma square caso o natural seja igual a 0, ou então, devolve uma lista
+de pares (Square,N0) caso o N0 seja diferente de 0. 
 
-% Esta lista, "contém" os quadrados do tapete de Sierpinski. Assim cada elemento da lista, tem diferentes coordenadas. 
+Esta lista, "contém" os quadrados do tapete de Sierpinski. Assim cada elemento da lista, tem diferentes coordenadas. 
 
-% Sendo assim, conseguimos perceber qual o trabalho que o gene (gsq) irá ter de realizar.
+Sendo assim, conseguimos perceber qual o trabalho que o gene (gsq) irá ter de realizar.
 \begin{code}
 
 squares = anaRose gsq
@@ -1542,68 +1540,66 @@ gsq2 (((x,y),z),w) = if w>0 then [(((x,y),z/3),w-1),
                                   (((x+2*z/3,y+2*z/3),z/3),w-1)] 
                     else []
 \end{code}
-% Nesta fase do problema 3, surge uma nova abordagem ao problema. Para explicar esta nova abordagem temos o seguinte:
+Nesta fase do problema 3, surge uma nova abordagem ao problema. Para explicar esta nova abordagem temos o seguinte:
 
-% - Na primeira abordagem feita ao problema, nós temos de inserir a square inicial e a profundidade até á qual queremos simular;
+- Na primeira abordagem feita ao problema, nós temos de inserir a square inicial e a profundidade até á qual queremos simular;
 
-% - Nesta nova abordagem, nós apenas teremos de inserir a profundidade até á qual queremos simular e a função dar-nos-á os tapetes devidamente prontos;
+- Nesta nova abordagem, nós apenas teremos de inserir a profundidade até á qual queremos simular e a função dar-nos-á os tapetes devidamente prontos;
 
-% Desta forma o resultado final, pode ser representado por este hilomorfismo:
+Desta forma o resultado final, pode ser representado por este hilomorfismo:
 
-% % \begin{spec}
-% % constructSierp ::Int -> IO [()]
+% \begin{spec}
+% constructSierp ::Int -> IO [()]
 
-% % constructSierp = present · carpets
-% % \end{spec}
+% constructSierp = present · carpets
+% \end{spec}
 
-% Com base na útlima abordagem conseguimos perceber, que iremos ter duas funções: a carpets e a present.
-% A função carpets recebe como input um inteiro, que representa a profundidade N e devolve uma lista de lista de Squares, que representam os tapetes de profundidade 0 
-% até á profundidade N-1.
-% Sendo assim, para uma profundidade igual a 0, não é criado qualquer tipo de tapete. Logo a lista resultado é uma lista vazia.
+Com base na útlima abordagem conseguimos perceber, que iremos ter duas funções: a carpets e a present.
+A função carpets recebe como input um inteiro, que representa a profundidade N e devolve uma lista de lista de Squares, que representam os tapetes de profundidade 0 
+até á profundidade N-1.
+Sendo assim, para uma profundidade igual a 0, não é criado qualquer tipo de tapete. Logo a lista resultado é uma lista vazia.
 
-% Para profundidades superiores a 0, é feito é o seguinte:
+Para profundidades superiores a 0, é feito é o seguinte:
 
-% 1º- Cálculo da carpets para profundidades inferiores á dada como parâmetro;
+1º- Cálculo da carpets para profundidades inferiores á dada como parâmetro;
 
-% 2º- Cálculo do sierpinski para profundidade inferior á dada como parâmetro.
+2º- Cálculo do sierpinski para profundidade inferior á dada como parâmetro.
 
-% Com isto percebemos como funciona a função carpets.
+Com isto percebemos como funciona a função carpets.
 \begin{code}
-carpets :: Int ->[[Square]]
 carpets 0 = []
 carpets n =carpets (n-1) ++ [sierpinski(((0,0),32),n-1)]
 \end{code}
-% A função present consome o resultado produzido pela carpets uma vez que ambas compõem um hilomorfismo. 
+A função present consome o resultado produzido pela carpets uma vez que ambas compõem um hilomorfismo. 
 
-% Assim o trabalho realizado pela função present é o seguinte:
+Assim o trabalho realizado pela função present é o seguinte:
 
-% -Cada elemento da lista [[Square]], que representa um tipo de tapete de sierpinski, é desenhado no ecrã(I\O) pela função drawSq;
+-Cada elemento da lista [[Square]], que representa um tipo de tapete de sierpinski, é desenhado no ecrã(I\O) pela função drawSq;
 
-% -Entre o desenho de cada tapete no ecrã,o programa tem de "parar" durante um determinado intervalo de tempo, sendo assim é chamada a função await.
+-Entre o desenho de cada tapete no ecrã,o programa tem de "parar" durante um determinado intervalo de tempo, sendo assim é chamada a função await.
 
-% O mmap é utilizado para aplicar o monade de I\O a cada elemento da lista dada como input. 
-% Desta forma, conseguimos perceber o funcionamento da função present que é composta por um monade de I\O. 
+O mmap é utilizado para aplicar o monade de I\O a cada elemento da lista dada como input. 
+Desta forma, conseguimos perceber o funcionamento da função present que é composta por um monade de I\O. 
 
 \begin{code}
-present :: [[Square]] -> IO [()]
 present = mmap (\ l -> do {drawSq l;await})
 \end{code}
-% Depois de calculadas estas duas funções, conseguimos por fim finalizar o hilomorfismo inicial, que constroi tapetes de Sierpinski precisando apenas
-% de uma determinada profundidade.
+Depois de calculadas estas duas funções, conseguimos por fim finalizar o hilomorfismo inicial, que constroi tapetes de Sierpinski precisando apenas
+de uma determinada profundidade.
 \subsection*{Problema 4}
 
-% Neste problema 4, é nos pedido que façamos uma espécie de simulação do campeonato do mundo que ocorreu este ano. Para isso vamos ter duas partes:
+Neste problema 4, é nos pedido que façamos uma espécie de simulação do campeonato do mundo que ocorreu este ano. Para isso vamos ter duas partes:
 
-% -Uma versão não probabilística em que se sabe à partida para um dado jogo, quem o vai vencer.
+-Uma versão não probabilística em que se sabe à partida para um dado jogo, quem o vai vencer.
 
-% -Uma versão com probabilidades, onde se usa o mónade Dist(que usa distribuições probabilísticas).
+-Uma versão com probabilidades, onde se usa o mónade Dist(que usa distribuições probabilísticas).
 
 \subsubsection*{Versão não probabilística}
 
-% Nesta primeira fase não probabilística, primeiramente, é nos pedido para definir uma alternativa à função genérica consolidate, que seja um catamorfismo de listas.
-% Para isso, tivemos de definir o gene do catamorfismo que está indicado em baixo.
+Nesta primeira fase não probabilística, primeiramente, é nos pedido para definir uma alternativa à função genérica consolidate, que seja um catamorfismo de listas.
+Para isso, tivemos de definir o gene do catamorfismo que está indicado em baixo.
 
-% Gene de |consolidate'|:
+Gene de |consolidate'|:
 
 \begin{code}
 
@@ -1616,12 +1612,12 @@ cgene = either cgene1 cgene2
 
 \end{code}
 
-% Geração dos jogos da fase de grupos:
+Geração dos jogos da fase de grupos:
 
-% Para decidir quem é o vencedor de um determinado jogo, tivemos de definir a função matchResult, que recebe como
-% argumentos a função gsCriteria que mediante um certo critério, calcula o resultado de um jogo, e um argumento de tipo Match, que é um par de Teams.
+Para decidir quem é o vencedor de um determinado jogo, tivemos de definir a função matchResult, que recebe como
+argumentos a função gsCriteria que mediante um certo critério, calcula o resultado de um jogo, e um argumento de tipo Match, que é um par de Teams.
 
-% A função encontra-se definida em baixo.
+A função encontra-se definida em baixo.
 
 \begin{code}
 matchResult gsCriteria (t1,t2) | gsCriteria (t1,t2) == Just t1 = [(t1,3),(t2,0)]
@@ -1629,22 +1625,18 @@ matchResult gsCriteria (t1,t2) | gsCriteria (t1,t2) == Just t1 = [(t1,3),(t2,0)]
                                | otherwise = [(t1,1),(t2,1)]
 \end{code}
 
-% De seguida, foi nos pedido para definir a função pairup, em que generateMatches se baseia.
-% Esta função, basicamente recebe uma lista de elementos de um certo tipo b, e cria uma lista de pares de elementos desse tipo.
+De seguida, foi nos pedido para definir a função pairup, em que generateMatches se baseia.
+Esta função, basicamente recebe uma lista de elementos de um certo tipo b, e cria uma lista de pares de elementos desse tipo.
 
 \begin{code}
-pairup [] = []
-pairup (x:xs) = map (\y -> (x,y)) xs ++ pairup xs 
-
+pairup = undefined
 \end{code}
 
-% Por último, foi nos pedido para definir o gene glt, que será usado na função initKnockoutStage.
-% O gene encontra-se definido em baixo.
+Por último, foi nos pedido para definir o gene glt, que será usado na função initKnockoutStage.
+O gene encontra-se definido em baixo.
 
 \begin{code}
-glt [x] = i1 x
-glt l = i2 (take n l,drop n l)
-        where n = div (length l) 2
+glt = undefined
 \end{code}
 
 \subsubsection*{Versão probabilística}
