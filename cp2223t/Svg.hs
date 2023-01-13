@@ -84,7 +84,7 @@ frac n m = n%m
 for b i 0 = i
 for b i (n+1) = b(for b i n)
 
-presort f = map snd . sort . (map (split f id)) -- pre-sorting on f-preorder
+presort' f = map snd . sort . (map (split f id)) -- pre-sorting on f-preorder
 
 apl :: [a -> b] -> [a] -> [b]
 apl f l = map ap (zip f l)
@@ -128,8 +128,8 @@ cl c     = c
 mT :: Eq a => [(a, b)] -> a -> Maybe b
 mT = flip lookup
 
-pap :: Eq a => [(a, t)] -> a -> t
-pap m = unJust . (mT m) where unJust (Just a) = a -- partial inspector of simple relation A->B
+pap' :: Eq a => [(a, t)] -> a -> t
+pap' m = unJust . (mT m) where unJust (Just a) = a -- partial inspector of simple relation A->B
 
 -- Abstract (point) level
 
@@ -545,7 +545,7 @@ dst (x,y) t = grp [
 ffdAux ff = (map (g><id) a,map (h><id) (converse b),[(g i,h(f i)) | i <- map fst a ]) where
   a = zip [1..] l
   b = zip r [1..]
-  f = pap b . pap ff . pap a
+  f = pap' b . pap' ff . pap' a
   (l,r) = (nub >< nub) . unzip $ ff
   g y = (5,y)
   h y = (9,y)

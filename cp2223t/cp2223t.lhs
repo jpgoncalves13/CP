@@ -1469,7 +1469,7 @@ A primeira parte do problema 3 consiste no cálculo dos gene das funções rose2
 
 Estes dois genes quando compostos formam o seguinte hilomorfismo:
 
-sierpinski :: (Square, Int) -$> [Square]
+sierpinski :: (Square, Int) -> [Square]
 
 sierpinski = hyloRose gr2l  gsq
 
@@ -1546,7 +1546,7 @@ Nesta fase do problema 3, surge uma nova abordagem ao problema. Para explicar es
 
 Desta forma o resultado final, pode ser representado por este hilomorfismo:
 
-constructSierp ::Int -$> IO [()]
+constructSierp ::Int -> IO [()]
 
 constructSierp = present · carpets
 
@@ -1585,19 +1585,58 @@ present = mmap (\ l -> do {drawSq l;await})
 Depois de calculadas estas duas funções, conseguimos por fim finalizar o hilomorfismo inicial, que constroi tapetes de Sierpinski precisando apenas
 de uma determinada profundidade.
 \subsection*{Problema 4}
+
+Neste problema 4, é nos pedido que façamos uma espécie de simulação do campeonato do mundo que ocorreu este ano. Para isso vamos ter duas partes:
+
+-Uma versão não probabilística em que se sabe à partida para um dado jogo, quem o vai vencer.
+
+-Uma versão com probabilidades, onde se usa o mónade Dist(que usa distribuições probabilísticas).
+
 \subsubsection*{Versão não probabilística}
+
+Nesta primeira fase não probabilística, primeiramente, é nos pedido para definir uma alternativa à função genérica consolidate, que seja um catamorfismo de listas.
+Para isso, tivemos de definir o gene do catamorfismo que está indicado em baixo.
+
 Gene de |consolidate'|:
+
 \begin{code}
-cgene = undefined
+cgene = either c1 c2
+c1 = nil
+c2 ((a,b), []) = [(a,b)]
+c2 ((a,b), (a1,b1):t) = if a == a1 then (a1,b1+b) : t
+                        else (a1,b1) : c2 ((a,b),t)
 \end{code}
+
 Geração dos jogos da fase de grupos:
+
+Para decidir quem é o vencedor de um determinado jogo, tivemos de definir a função matchResult, que recebe como
+argumentos a função gsCriteria que mediante um certo critério, calcula o resultado de um jogo, e um argumento de tipo Match, que é um par de Teams.
+
+A função encontra-se definida em baixo.
+
 \begin{code}
-pairup = undefined
-
-matchResult = undefined
-
-glt = undefined
+matchResult gsCriteria (t1,t2) = if gsCriteria (t1,t2) == Just t1 then [(t1,3),(t2,0)]
+                                 else if gsCriteria (t1,t2) == Just t2 then [(t1,0),(t2,3)]
+                                 else [(t1,1),(t2,1)]
 \end{code}
+
+De seguida, foi nos pedido para definir a função pairup, em que generateMatches se baseia.
+Esta função, basicamente recebe uma lista de elementos de um certo tipo b, e cria uma lista de pares de elementos desse tipo.
+
+\begin{code}
+pairup [] = []
+pairup (x:xs) = map(\y -> (x,y)) xs ++ pairup xs 
+\end{code}
+
+Por último, foi nos pedido para definir o gene glt, que será usado na função initKnockoutStage.
+O gene encontra-se definido em baixo.
+
+\begin{code}
+glt [x] = i1 x
+glt l = i2 (take n l,drop n l)
+        where n = div (length l) 2
+\end{code}
+
 \subsubsection*{Versão probabilística}
 \begin{code}
 pinitKnockoutStage = undefined
