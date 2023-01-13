@@ -1610,6 +1610,24 @@ cgene = either cgene1 cgene2
                          else (a1,b1) : cgene2 ((a,b), l)
 \end{code}
 
+O diagrama representativo do catamorfismo utilizado na função consolidate' é o seguinte:
+
+\begin{eqnarray*}
+\xymatrix@@C=3cm{
+    (S \times N_0)^*
+           \ar[d]_-{|cataList cgene|}
+&
+    1 + (S \times N_0) + (S \times N_0)^*
+           \ar[d]^{|id| + |id| \times |cataList cgene|}
+           \ar[l]_-{|inList|}
+\\
+     (S \times N_0)^*
+&
+     1 + (S \times N_0) \times (S \times N_0)^*
+           \ar[l]^-{|cgene|}
+}
+\end{eqnarray*}
+
 Geração dos jogos da fase de grupos:
 
 Para decidir quem é o vencedor de um determinado jogo, tivemos de definir a função matchResult, que recebe como
@@ -1643,12 +1661,6 @@ glt l = i2 (splitAt n l)
 
 O diagrama representativo do anamorfismo utilizado na função initKnockoutStage é o seguinte:
 
-\begin{eqnarray*}
-\xymatrix{
-    |LTree A| & & A -|- (|LTree A| \times |LTree A|) ^* \ar[ll]_{|inLTree|} \\
-    (A^*)\ar@@/_1.5pc/[rr]_{|glt|}\ar[u]^{|anaList gsq|} & A -|- (A^* \times A)^*\ar[u]_{|id + anaList glt + anaList glt|}
-}
-\end{eqnarray*}
 
 \subsubsection*{Versão probabilística}
 \begin{code}
