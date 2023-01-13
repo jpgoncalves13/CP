@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use tuple-section" #-}
 \documentclass[a4paper]{article}
 \usepackage[a4paper,left=3cm,right=2cm,top=2.5cm,bottom=2.5cm]{geometry}
 \usepackage[sfdefault, book, lf]{FiraSans} % lf - lined numbers
@@ -1611,9 +1613,9 @@ argumentos a função gsCriteria que mediante um certo critério, calcula o resu
 A função encontra-se definida em baixo.
 
 \begin{code}
-matchResult gsCriteria (t1,t2) = if gsCriteria (t1,t2) == Just t1 then [(t1,3),(t2,0)]
-                                 else if gsCriteria (t1,t2) == Just t2 then [(t1,0),(t2,3)]
-                                 else [(t1,1),(t2,1)]
+matchResult gsCriteria (t1,t2) | gsCriteria (t1,t2) == Just t1 = [(t1,3),(t2,0)]
+                               | gsCriteria (t1,t2) == Just t2 = [(t1,0),(t2,3)]
+                               | otherwise = [(t1,1),(t2,1)]
 \end{code}
 
 De seguida, foi nos pedido para definir a função pairup, em que generateMatches se baseia.
@@ -1621,7 +1623,7 @@ Esta função, basicamente recebe uma lista de elementos de um certo tipo b, e c
 
 \begin{code}
 pairup [] = []
-pairup (x:xs) = map(\y -> (x,y)) xs ++ pairup xs 
+pairup (x:xs) = map (\y -> (x,y)) xs ++ pairup xs 
 \end{code}
 
 Por último, foi nos pedido para definir o gene glt, que será usado na função initKnockoutStage.
