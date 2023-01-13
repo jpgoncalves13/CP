@@ -1602,14 +1602,11 @@ Para isso, tivemos de definir o gene do catamorfismo que está indicado em baixo
 Gene de |consolidate'|:
 
 \begin{code}
-
-cgene :: (Eq a, Num b) => Either () ((a, b), [(a, b)])-> [(a, b)]
-cgene = either cgene1 cgene2
-  where cgene1 = nil
-        cgene2 ((a,b), []) = [(a,b)]
-        cgene2 ((a,b), (a1,b1) : l) = if a == a1 then (a,b+b1) : l  
-                         else (a1,b1) : cgene2 ((a,b), l)
-
+cgene = either c1 c2
+c1 = nil
+c2 ((a,b), []) = [(a,b)]
+c2 ((a,b), (a1,b1):t) = if a == a1 then (a1,b1+b) : t
+                        else (a1,b1) : c2 ((a,b),t)
 \end{code}
 
 Geração dos jogos da fase de grupos:
@@ -1620,24 +1617,36 @@ argumentos a função gsCriteria que mediante um certo critério, calcula o resu
 A função encontra-se definida em baixo.
 
 \begin{code}
-matchResult gsCriteria (t1,t2) | gsCriteria (t1,t2) == Just t1 = [(t1,3),(t2,0)]
-                               | gsCriteria (t1,t2) == Just t2 = [(t1,0),(t2,3)]
-                               | otherwise = [(t1,1),(t2,1)]
+matchResult gsCriteria (t1,t2) = if gsCriteria (t1,t2) == Just t1 then [(t1,3),(t2,0)]
+                                 else if gsCriteria (t1,t2) == Just t2 then [(t1,0),(t2,3)]
+                                 else [(t1,1),(t2,1)]
 \end{code}
 
 De seguida, foi nos pedido para definir a função pairup, em que generateMatches se baseia.
 Esta função, basicamente recebe uma lista de elementos de um certo tipo b, e cria uma lista de pares de elementos desse tipo.
 
 \begin{code}
-pairup = undefined
+pairup [] = []
+pairup (x:xs) = map(\y -> (x,y)) xs ++ pairup xs 
 \end{code}
 
-Por último, foi nos pedido para definir o gene glt, que será usado na função initKnockoutStage.
+Por último, foi nos pedido para definir o gene glt, que será usado na função initKnockoutStage por um anamorfismo.
 O gene encontra-se definido em baixo.
 
 \begin{code}
-glt = undefined
+glt :: Eq a => [a] -> Either a ([a], [a])
+glt [x] = i1 x
+glt l = i2 splitAt n l where n = div (length l) 2
 \end{code}
+
+O diagrama representativo do anamorfismo utilizado na função initKnockoutStage é o seguinte:
+
+\begin{eqnarray*}
+\xymatrix{
+    |LTree A| & & A -|- (|LTree A| \times |LTree A|) ^* \ar[ll]_{|inLTree|} \\
+    (A^*)\ar@@/_1.5pc/[rr]_{|glt|}\ar[u]^{|anaList gsq|} & A -|- (A^* \times A)^*\ar[u]_{|id + anaList glt + anaList glt|}
+}
+\end{eqnarray*}
 
 \subsubsection*{Versão probabilística}
 \begin{code}
