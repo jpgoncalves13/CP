@@ -1465,7 +1465,15 @@ post = cataExp gnp
 \end{code}
 
 \subsection*{Problema 3}
-Para resolvermos o problema número 3 nós começamos por descobrir o gene do catamorfismo rose2List, sendo assim obtivemos o seguinte diagrama:
+A primeira parte do problema 3 consiste no cálculo dos gene das funções rose2List e squares. 
+
+Estes dois genes quando compostos formam o seguinte hilomorfismo:
+
+sierpinski :: (Square, Int) -$> [Square]
+
+sierpinski = hyloRose gr2l  gsq
+
+Para resolvermos o hilomorfismo abordado anteriormente, nós começamos por descobrir o gene do catamorfismo rose2List.Sendo assim obtivemos o seguinte diagrama:
 \begin{eqnarray*}
 \xymatrix@@C=3cm{
     |Rose A|
@@ -1496,24 +1504,86 @@ rose2List = cataRose gr2l
 
 gr2l (a,l)=a:concat l
 \end{code}
+Tal como aconteceu para o cálculo do gene do catamorfismo, adotamos a mesma estratégia para o cálculo do gene do anamorfismo. Sendo assim o diagrama que corresponde
+ao anamorfismo é o seguinte:
+\begin{eqnarray*}
+\xymatrix{
+  |Rose Square| & & Square \times (|Rose Square|)^*\ar[ll]_{|inRose|} \\
+  (Square,N_0)\ar@@/_1.5pc/[rr]_{|gsq|}\ar[r]^(0.55){|outNat.p2|}\ar[u]^{|anaRose gsq|} & 1+(N_0)\ar[r]^(0.35){\cdots} & Square\times (Square,N_0)^*\ar[u]_{|(RecRose (cataRose gr2l))|}
+}
+\end{eqnarray*}
+Visualizando o diagrama do anamorfismo, conseguimos perceber que apenas temos de calcular o gene do anamorfismo. 
+Sendo assim, se repararmos no diagrama do anamorfismo, o gene recebe um par composto por (Square,N0) e tem de devolver um par composto por 
+uma square e uma lista composta por (Square,N_0) . 
+
+Com base no que foi dito anteriormente, conseguimos perceber que o gene tem de devolver uma square caso o natural seja igual a 0, ou então, devolve uma lista
+de pares (Square,N0) caso o N0 seja diferente de 0. 
+
+Esta lista, "contém" os quadrados do tapete de Sierpinski. Assim cada elemento da lista, tem diferentes coordenadas. 
+
+Sendo assim, conseguimos perceber qual o trabalho que o gene (gsq) irá ter de realizar.
 \begin{code}
 
 squares = anaRose gsq
 
 gsq = split gsq1 gsq2
-  where gsq1 (((x,y),z),w) =((x+z/3,y+z/3),z/3)
-        gsq2 (((x,y),z),w) = if w>0 then [(((x,y),z/3),w-1),  (((x+z/3,y),z/3),w-1),  (((x+(2*z/3),y),z/3),w-1), (((x,y+z/3),z/3),w-1),(((x+2*z/3,y+z/3),z/3),w-1), (((x,y+2*z/3),z/3),w-1), (((x+z/3,y+2*z/3),z/3),w-1) , (((x+2*z/3,y+2*z/3),z/3),w-1)] 
-                             else []
+gsq1 (((x,y),z),w) =((x+z/3,y+z/3),z/3)
+gsq2 (((x,y),z),w) = if w>0 then [(((x,y),z/3),w-1),  
+                                  (((x+z/3,y),z/3),w-1),  
+                                  (((x+(2*z/3),y),z/3),w-1), 
+                                  (((x,y+z/3),z/3),w-1),
+                                  (((x+2*z/3,y+z/3),z/3),w-1),
+                                  (((x,y+2*z/3),z/3),w-1), 
+                                  (((x+z/3,y+2*z/3),z/3),w-1),
+                                  (((x+2*z/3,y+2*z/3),z/3),w-1)] 
+                    else []
+\end{code}
+Nesta fase do problema 3, surge uma nova abordagem ao problema. Para explicar esta nova abordagem temos o seguinte:
 
+- Na primeira abordagem feita ao problema, nós temos de inserir a square inicial e a profundidade até á qual queremos simular;
 
+- Nesta nova abordagem, nós apenas teremos de inserir a profundidade até á qual queremos simular e a função dar-nos-á os tapetes devidamente prontos;
+
+Desta forma o resultado final, pode ser representado por este hilomorfismo:
+
+constructSierp ::Int -$> IO [()]
+
+constructSierp = present · carpets
+
+Com base na útlima abordagem conseguimos perceber, que iremos ter duas funções: a carpets e a present.
+A função carpets recebe como input um inteiro, que representa a profundidade N e devolve uma lista de lista de Squares, que representam os tapetes de profundidade 0 
+até á profundidade N-1.
+Sendo assim, para uma profundidade igual a 0, não é criado qualquer tipo de tapete. Logo a lista resultado é uma lista vazia.
+
+Para profundidades superiores a 0, é feito é o seguinte:
+
+1º- Cálculo da carpets para profundidades inferiores á dada como parâmetro;
+
+2º- Cálculo do sierpinski para profundidade inferior á dada como parâmetro.
+
+Com isto percebemos como funciona a função carpets.
+\begin{code}
 carpets :: Int ->[[Square]]
 carpets 0 = []
 carpets n =carpets (n-1) ++ [sierpinski(((0,0),32),n-1)]
-
-present :: [[Square]] -> IO [()]
-present = mmap ($\$ l -> do {drawSq l;await})
 \end{code}
+A função present consome o resultado produzido pela carpets uma vez que ambas compõem um hilomorfismo. 
 
+Assim o trabalho realizado pela função present é o seguinte:
+
+-Cada elemento da lista [[Square]], que representa um tipo de tapete de sierpinski, é desenhado no ecrã(I\O) pela função drawSq;
+
+-Entre o desenho de cada tapete no ecrã,o programa tem de "parar" durante um determinado intervalo de tempo, sendo assim é chamada a função await.
+
+O mmap é utilizado para aplicar o monade de I\O a cada elemento da lista dada como input. 
+Desta forma, conseguimos perceber o funcionamento da função present que é composta por um monade de I\O. 
+
+\begin{code}
+present :: [[Square]] -> IO [()]
+present = mmap (\ l -> do {drawSq l;await})
+\end{code}
+Depois de calculadas estas duas funções, conseguimos por fim finalizar o hilomorfismo inicial, que constroi tapetes de Sierpinski precisando apenas
+de uma determinada profundidade.
 \subsection*{Problema 4}
 \subsubsection*{Versão não probabilística}
 Gene de |consolidate'|:

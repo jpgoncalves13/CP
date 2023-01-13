@@ -2014,7 +2014,15 @@ Culminando na função de pós-processamento:
 \end{hscode}\resethooks
 
 \subsection*{Problema 3}
-Para resolvermos o problema número 3 nós começamos por descobrir o gene do catamorfismo rose2List, sendo assim obtivemos o seguinte diagrama:
+A primeira parte do problema 3 consiste no cálculo dos gene das funções rose2List e squares. 
+
+Estes dois genes quando compostos formam o seguinte hilomorfismo:
+
+sierpinski :: (Square, Int) -$> [Square]
+
+sierpinski = hyloRose gr2l  gsq
+
+Para resolvermos o hilomorfismo abordado anteriormente, nós começamos por descobrir o gene do catamorfismo rose2List.Sendo assim obtivemos o seguinte diagrama:
 \begin{eqnarray*}
 \xymatrix@C=3cm{
     \ensuremath{\Conid{Rose}\;\Conid{A}}
@@ -2048,41 +2056,117 @@ Com base nesta explicação do diagrama conseguimos perceber que a função rose
 \>[B]{}\Varid{gr2l}\;(\Varid{a},\Varid{l})\mathrel{=}\Varid{a}\mathbin{:}\Varid{concat}\;\Varid{l}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+Tal como aconteceu para o cálculo do gene do catamorfismo, adotamos a mesma estratégia para o cálculo do gene do anamorfismo. Sendo assim o diagrama que corresponde
+ao anamorfismo é o seguinte:
+\begin{eqnarray*}
+\xymatrix{
+  \ensuremath{\Conid{Rose}\;\Conid{Square}} & & Square \times (\ensuremath{\Conid{Rose}\;\Conid{Square}})^*\ar[ll]_{\ensuremath{\Varid{inRose}}} \\
+  (Square,N_0)\ar@/_1.5pc/[rr]_{\ensuremath{\Varid{gsq}}}\ar[r]^(0.55){\ensuremath{\Varid{outNat}\comp \p2}}\ar[u]^{\ensuremath{\lanabracket\;\!\Varid{gsq}\;\!\ranabracket_\textit{\tiny R}}} & 1+(N_0)\ar[r]^(0.35){\cdots} & Square\times (Square,N_0)^*\ar[u]_{\ensuremath{(\Conid{RecRose}\;\llparenthesis\, \Varid{gr2l}\,\rrparenthesis_\textit{\tiny R})}}
+}
+\end{eqnarray*}
+Visualizando o diagrama do anamorfismo, conseguimos perceber que apenas temos de calcular o gene do anamorfismo. 
+Sendo assim, se repararmos no diagrama do anamorfismo, o gene recebe um par composto por (Square,N0) e tem de devolver um par composto por 
+uma square e uma lista composta por (Square,N_0) . 
+
+Com base no que foi dito anteriormente, conseguimos perceber que o gene tem de devolver uma square caso o natural seja igual a 0, ou então, devolve uma lista
+de pares (Square,N0) caso o N0 seja diferente de 0. 
+
+Esta lista, "contém" os quadrados do tapete de Sierpinski. Assim cada elemento da lista, tem diferentes coordenadas. 
+
+Sendo assim, conseguimos perceber qual o trabalho que o gene (gsq) irá ter de realizar.
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{9}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{30}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{63}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{87}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{21}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{35}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{squares}\mathrel{=}\lanabracket\;\!\Varid{gsq}\;\!\ranabracket_\textit{\tiny R}{}\<[E]%
 \\[\blanklineskip]%
 \>[B]{}\Varid{gsq}\mathrel{=}\conj{\Varid{gsq1}}{\Varid{gsq2}}{}\<[E]%
 \\
-\>[B]{}\hsindent{3}{}\<[3]%
-\>[3]{}\mathbf{where}\;\Varid{gsq1}\;(((\Varid{x},\Varid{y}),\Varid{z}),\Varid{w})\mathrel{=}((\Varid{x}\mathbin{+}\Varid{z}\mathbin{/}\mathrm{3},\Varid{y}\mathbin{+}\Varid{z}\mathbin{/}\mathrm{3}),\Varid{z}\mathbin{/}\mathrm{3}){}\<[E]%
+\>[B]{}\Varid{gsq1}\;(((\Varid{x},\Varid{y}),\Varid{z}),\Varid{w})\mathrel{=}((\Varid{x}\mathbin{+}\Varid{z}\mathbin{/}\mathrm{3},\Varid{y}\mathbin{+}\Varid{z}\mathbin{/}\mathrm{3}),\Varid{z}\mathbin{/}\mathrm{3}){}\<[E]%
 \\
-\>[3]{}\hsindent{6}{}\<[9]%
-\>[9]{}\Varid{gsq2}\;(((\Varid{x},\Varid{y}),\Varid{z}),\Varid{w})\mathrel{=}\mathbf{if}\;\Varid{w}\mathbin{>}\mathrm{0}\;\mathbf{then}\;[\mskip1.5mu (((\Varid{x},\Varid{y}),\Varid{z}\mathbin{/}\mathrm{3}),\Varid{w}\mathbin{-}\mathrm{1}),{}\<[63]%
-\>[63]{}(((\Varid{x}\mathbin{+}\Varid{z}\mathbin{/}\mathrm{3},\Varid{y}),\Varid{z}\mathbin{/}\mathrm{3}),\Varid{w}\mathbin{-}\mathrm{1}),{}\<[87]%
-\>[87]{}(((\Varid{x}\mathbin{+}(\mathrm{2}\mathbin{*}\Varid{z}\mathbin{/}\mathrm{3}),\Varid{y}),\Varid{z}\mathbin{/}\mathrm{3}),\Varid{w}\mathbin{-}\mathrm{1}),(((\Varid{x},\Varid{y}\mathbin{+}\Varid{z}\mathbin{/}\mathrm{3}),\Varid{z}\mathbin{/}\mathrm{3}),\Varid{w}\mathbin{-}\mathrm{1}),(((\Varid{x}\mathbin{+}\mathrm{2}\mathbin{*}\Varid{z}\mathbin{/}\mathrm{3},\Varid{y}\mathbin{+}\Varid{z}\mathbin{/}\mathrm{3}),\Varid{z}\mathbin{/}\mathrm{3}),\Varid{w}\mathbin{-}\mathrm{1}),(((\Varid{x},\Varid{y}\mathbin{+}\mathrm{2}\mathbin{*}\Varid{z}\mathbin{/}\mathrm{3}),\Varid{z}\mathbin{/}\mathrm{3}),\Varid{w}\mathbin{-}\mathrm{1}),(((\Varid{x}\mathbin{+}\Varid{z}\mathbin{/}\mathrm{3},\Varid{y}\mathbin{+}\mathrm{2}\mathbin{*}\Varid{z}\mathbin{/}\mathrm{3}),\Varid{z}\mathbin{/}\mathrm{3}),\Varid{w}\mathbin{-}\mathrm{1}),(((\Varid{x}\mathbin{+}\mathrm{2}\mathbin{*}\Varid{z}\mathbin{/}\mathrm{3},\Varid{y}\mathbin{+}\mathrm{2}\mathbin{*}\Varid{z}\mathbin{/}\mathrm{3}),\Varid{z}\mathbin{/}\mathrm{3}),\Varid{w}\mathbin{-}\mathrm{1})\mskip1.5mu]{}\<[E]%
+\>[B]{}\Varid{gsq2}\;(((\Varid{x},\Varid{y}),\Varid{z}),\Varid{w})\mathrel{=}\mathbf{if}\;\Varid{w}\mathbin{>}\mathrm{0}\;\mathbf{then}\;[\mskip1.5mu (((\Varid{x},\Varid{y}),\Varid{z}\mathbin{/}\mathrm{3}),\Varid{w}\mathbin{-}\mathrm{1}),{}\<[E]%
 \\
-\>[9]{}\hsindent{21}{}\<[30]%
-\>[30]{}\mathbf{else}\;[\mskip1.5mu \mskip1.5mu]{}\<[E]%
-\\[\blanklineskip]%
+\>[B]{}\hsindent{35}{}\<[35]%
+\>[35]{}(((\Varid{x}\mathbin{+}\Varid{z}\mathbin{/}\mathrm{3},\Varid{y}),\Varid{z}\mathbin{/}\mathrm{3}),\Varid{w}\mathbin{-}\mathrm{1}),{}\<[E]%
+\\
+\>[B]{}\hsindent{35}{}\<[35]%
+\>[35]{}(((\Varid{x}\mathbin{+}(\mathrm{2}\mathbin{*}\Varid{z}\mathbin{/}\mathrm{3}),\Varid{y}),\Varid{z}\mathbin{/}\mathrm{3}),\Varid{w}\mathbin{-}\mathrm{1}),{}\<[E]%
+\\
+\>[B]{}\hsindent{35}{}\<[35]%
+\>[35]{}(((\Varid{x},\Varid{y}\mathbin{+}\Varid{z}\mathbin{/}\mathrm{3}),\Varid{z}\mathbin{/}\mathrm{3}),\Varid{w}\mathbin{-}\mathrm{1}),{}\<[E]%
+\\
+\>[B]{}\hsindent{35}{}\<[35]%
+\>[35]{}(((\Varid{x}\mathbin{+}\mathrm{2}\mathbin{*}\Varid{z}\mathbin{/}\mathrm{3},\Varid{y}\mathbin{+}\Varid{z}\mathbin{/}\mathrm{3}),\Varid{z}\mathbin{/}\mathrm{3}),\Varid{w}\mathbin{-}\mathrm{1}),{}\<[E]%
+\\
+\>[B]{}\hsindent{35}{}\<[35]%
+\>[35]{}(((\Varid{x},\Varid{y}\mathbin{+}\mathrm{2}\mathbin{*}\Varid{z}\mathbin{/}\mathrm{3}),\Varid{z}\mathbin{/}\mathrm{3}),\Varid{w}\mathbin{-}\mathrm{1}),{}\<[E]%
+\\
+\>[B]{}\hsindent{35}{}\<[35]%
+\>[35]{}(((\Varid{x}\mathbin{+}\Varid{z}\mathbin{/}\mathrm{3},\Varid{y}\mathbin{+}\mathrm{2}\mathbin{*}\Varid{z}\mathbin{/}\mathrm{3}),\Varid{z}\mathbin{/}\mathrm{3}),\Varid{w}\mathbin{-}\mathrm{1}),{}\<[E]%
+\\
+\>[B]{}\hsindent{35}{}\<[35]%
+\>[35]{}(((\Varid{x}\mathbin{+}\mathrm{2}\mathbin{*}\Varid{z}\mathbin{/}\mathrm{3},\Varid{y}\mathbin{+}\mathrm{2}\mathbin{*}\Varid{z}\mathbin{/}\mathrm{3}),\Varid{z}\mathbin{/}\mathrm{3}),\Varid{w}\mathbin{-}\mathrm{1})\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\hsindent{21}{}\<[21]%
+\>[21]{}\mathbf{else}\;[\mskip1.5mu \mskip1.5mu]{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Nesta fase do problema 3, surge uma nova abordagem ao problema. Para explicar esta nova abordagem temos o seguinte:
+
+- Na primeira abordagem feita ao problema, nós temos de inserir a square inicial e a profundidade até á qual queremos simular;
+
+- Nesta nova abordagem, nós apenas teremos de inserir a profundidade até á qual queremos simular e a função dar-nos-á os tapetes devidamente prontos;
+
+Desta forma o resultado final, pode ser representado por este hilomorfismo:
+
+constructSierp ::Int -$> IO [()]
+
+constructSierp = present · carpets
+
+Com base na útlima abordagem conseguimos perceber, que iremos ter duas funções: a carpets e a present.
+A função carpets recebe como input um inteiro, que representa a profundidade N e devolve uma lista de lista de Squares, que representam os tapetes de profundidade 0 
+até á profundidade N-1.
+Sendo assim, para uma profundidade igual a 0, não é criado qualquer tipo de tapete. Logo a lista resultado é uma lista vazia.
+
+Para profundidades superiores a 0, é feito é o seguinte:
+
+1º- Cálculo da carpets para profundidades inferiores á dada como parâmetro;
+
+2º- Cálculo do sierpinski para profundidade inferior á dada como parâmetro.
+
+Com isto percebemos como funciona a função carpets.
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{carpets}\mathbin{::}\Conid{Int}\to [\mskip1.5mu [\mskip1.5mu \Conid{Square}\mskip1.5mu]\mskip1.5mu]{}\<[E]%
 \\
 \>[B]{}\Varid{carpets}\;\mathrm{0}\mathrel{=}[\mskip1.5mu \mskip1.5mu]{}\<[E]%
 \\
 \>[B]{}\Varid{carpets}\;\Varid{n}\mathrel{=}\Varid{carpets}\;(\Varid{n}\mathbin{-}\mathrm{1})\mathbin{+\!\!\!+}[\mskip1.5mu \Varid{sierpinski}\;(((\mathrm{0},\mathrm{0}),\mathrm{32}),\Varid{n}\mathbin{-}\mathrm{1})\mskip1.5mu]{}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\Varid{present}\mathbin{::}[\mskip1.5mu [\mskip1.5mu \Conid{Square}\mskip1.5mu]\mskip1.5mu]\to \fun{IO}\;[\mskip1.5mu ()\mskip1.5mu]{}\<[E]%
-\\
-\>[B]{}\Varid{present}\mathrel{=}\Varid{mmap}\;(\mathbin{\$\char92 \$}\Varid{l}\to \mathbf{do}\;\{\mskip1.5mu \Varid{drawSq}\;\Varid{l};\Varid{await}\mskip1.5mu\}){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+A função present consome o resultado produzido pela carpets uma vez que ambas compõem um hilomorfismo. 
 
+Assim o trabalho realizado pela função present é o seguinte:
+
+-Cada elemento da lista [[Square]], que representa um tipo de tapete de sierpinski, é desenhado no ecrã(I\O) pela função drawSq;
+
+-Entre o desenho de cada tapete no ecrã,o programa tem de "parar" durante um determinado intervalo de tempo, sendo assim é chamada a função await.
+
+O mmap é utilizado para aplicar o monade de I\O a cada elemento da lista dada como input. 
+Desta forma, conseguimos perceber o funcionamento da função present que é composta por um monade de I\O. 
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{present}\mathbin{::}[\mskip1.5mu [\mskip1.5mu \Conid{Square}\mskip1.5mu]\mskip1.5mu]\to \fun{IO}\;[\mskip1.5mu ()\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\Varid{present}\mathrel{=}\Varid{mmap}\;(\lambda \Varid{l}\to \mathbf{do}\;\{\mskip1.5mu \Varid{drawSq}\;\Varid{l};\Varid{await}\mskip1.5mu\}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Depois de calculadas estas duas funções, conseguimos por fim finalizar o hilomorfismo inicial, que constroi tapetes de Sierpinski precisando apenas
+de uma determinada profundidade.
 \subsection*{Problema 4}
 \subsubsection*{Versão não probabilística}
 Gene de \ensuremath{\Varid{consolidate'}}:
