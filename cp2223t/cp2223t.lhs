@@ -1645,12 +1645,15 @@ glt l = i2 (take n l,drop n l)
 
 \subsubsection*{Versão probabilística}
 \begin{code}
-pinitKnockoutStage = undefined
+pinitKnockoutStage l =  do {return (initKnockoutStage l)}
 
 pgroupWinners :: (Match -> Dist (Maybe Team)) -> [Match] -> Dist [Team]
-pgroupWinners = undefined
+pgroupWinners criteria = fmap (best 2 . consolidate' . concat) . mmap (pmatchResult criteria)
 
-pmatchResult = undefined
+
+pmatchResult criteria m = do { r <- criteria m; return (f m r)}
+                          where f (t1,t2) Nothing = [(t1,1),(t2,1)]
+                                f (t1,t2) (Just t) = if t == t1 then [(t1,3),(t2,0)] else [(t1,0),(t2,3)]
 \end{code}
 
 %----------------- Índice remissivo (exige makeindex) -------------------------%
