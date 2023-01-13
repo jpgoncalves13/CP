@@ -1640,16 +1640,75 @@ glt = undefined
 \end{code}
 
 \subsubsection*{Versão probabilística}
+
+Para a versão probabilística, como é dito anteriormento, primereiro avaliamos o impacto de |gsCriteria| virar monádica. 
+Para isso as funções que sofrem alterações são a |pinitKnockoutStage|, |pgroupWinners| e |pmatchResult|.
+Na |pmatchResult| verificamos que como o criterio mudou é necessário monadificar o código do matchResult: 
+
+\begin{spec}
+matchResult gsCriteria (t1,t2) | gsCriteria (t1,t2) == Just t1 = [(t1,3),(t2,0)]
+                               | gsCriteria (t1,t2) == Just t2 = [(t1,0),(t2,3)]
+                               | otherwise = [(t1,1),(t2,1)]
+\end{spec}
+
+Para monadificar é feita usamos a notação |let|:
+
+\begin{spec}
+matchResult gsCriteria (t1,t2) = let x = gsCriteria (t1,t2) in f x 
+                                  where f Nothing = [(t1,1),(t2,1)]
+                                        f (Just t) = if t == t1 then [(t1,3),(t2,0)] else  [(t1,0),(t2,3)]
+\end{spec}
+
+Agora passamos para a versão monádica:
+
+\begin{code}
+pmatchResult criteria (t1,t2) = do { r <- criteria (t1,t2); return (f r)}
+                               where f Nothing = [(t1,1),(t2,1)]
+                                     f (Just t) = if t == t1 then [(t1,3),(t2,0)] else [(t1,0),(t2,3)]
+\end{code}
+
+Passamos agora à função |pgroupWinners|, e esta necessita de ser alterada em alguns aspetos.    
+Primeiro temos de descobrir os resultados de cada partida através do novo critério, e para isso aplicamos o map monádico, o |mmap|. 
+Depois temos de aplicar o conjunto de funções necessárias para descobrir as duas melhores equipas do grupo, e para isso é necessário serem executadas no interior do monade e para isso usamos o fmap.  
+Dando origem à seguinte definição:
+
+\begin{code}
+
+pgroupWinners :: (Match -> Dist (Maybe Team)) -> [Match] -> Dist [Team]
+pgroupWinners criteria = fmap (best 2 . consolidate . concat) . mmap (pmatchResult criteria)
+
+\end{code}
+
+Por fim é necessário monadificar a função |initKnockoutStage|.    
+Neste caso, esta é usada após a composição monádica, como indicado:
+
+\begin{eqnarray*}
+\start
+|pgroupStage = pinitKnockoutStage .! psimulateGroupStage . genGroupStageMatches|
+%
+\just\equiv{ (66) }
+|pgroupStage = \mu . T pinitKnockoutStage . psimulateGroupStage . genGroupStageMatches|
+%
+\qed
+\end{eqnarray*}
+
+Assim sendo, pinitKnockoutStage vai ser aplicada da seguinte forma: 
+
+\begin{eqnarray*}
+\xymatrix@@C=3cm{
+    Dist (Team^*)^*
+           \ar[d]_-{|Dist pinitKnockoutStage|}
+\\
+    |Dist (LTree Team)|
+}
+\end{eqnarray*}
+
+
+Concluindo o que é necessário fazer é aplicar a função de return à função de |initKnockoutStage|:
+
 \begin{code}
 pinitKnockoutStage l =  do {return (initKnockoutStage l)}
 
-pgroupWinners :: (Match -> Dist (Maybe Team)) -> [Match] -> Dist [Team]
-pgroupWinners criteria = fmap (best 2 . consolidate' . concat) . mmap (pmatchResult criteria)
-
-
-pmatchResult criteria m = do { r <- criteria m; return (f m r)}
-                          where f (t1,t2) Nothing = [(t1,1),(t2,1)]
-                                f (t1,t2) (Just t) = if t == t1 then [(t1,3),(t2,0)] else [(t1,0),(t2,3)]
 \end{code}
 
 %----------------- Índice remissivo (exige makeindex) -------------------------%
