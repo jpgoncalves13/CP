@@ -1602,7 +1602,15 @@ Para isso, tivemos de definir o gene do catamorfismo que está indicado em baixo
 Gene de |consolidate'|:
 
 \begin{code}
-cgene = undefined 
+cgene :: (Eq a, Num b) => Either () ((a, b), [(a, b)])-> [(a, b)]
+cgene = either cgene1 cgene2
+
+cgene1 = nil
+cgene2 :: (Eq a, Num b) => ((a, b), [(a, b)]) -> [(a, b)]
+cgene2 ((a,b), []) = [(a,b)]
+cgene2 ((a,b), (a1,b1) : l) = if a == a1 then (a,b+b1) : l  
+                         else (a1,b1) : cgene2 ((a,b), l)
+
 \end{code}
 
 Geração dos jogos da fase de grupos:
