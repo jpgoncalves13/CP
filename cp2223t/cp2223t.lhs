@@ -1104,6 +1104,43 @@ Outras funções que podem ser úteis:
 rcons(x,a) = x++[a]
 \end{code}
 
+\subsection{Ranking baseado no momento das equipas antes do mundial} 
+
+\begin{code}
+rankings1 = [
+         ("Brazil",5.0),
+         ("France",4.8),
+         ("Argentina",4.7),
+         ("England",4.5),
+         ("Spain",4.45),
+         ("Germany",4.4),
+         ("Belgium",4.45),
+         ("Portugal",4.3),
+         ("Denmark",4.25),
+         ("Netherlands",4.2),
+         ("Croatia",4.1),
+         ("Uruguay",4.05),
+         ("Cameroon",4.0),
+         ("Canada",4.0),
+         ("Costa Rica",3.9),
+         ("Ecuador",3.9),
+         ("Ghana",3.8),
+         ("Iran",3.8),
+         ("Japan",3.7),
+         ("Korea Republic",3.6),
+         ("Mexico",3.5),
+         ("Morocco",3.5),
+         ("Poland",3.4),
+         ("Saudi Arabia",3.4),
+         ("Senegal",3.3),
+         ("Serbia",3.2),
+         ("Switzerland",3.1),
+         ("Tunisia",3.0),
+         ("USA",3.0),
+         ("Wales",2.9),
+         ("Qatar",2.5)]
+\end{code}
+
 %----------------- Soluções dos alunos -----------------------------------------%
 
 \section{Soluções dos alunos}\label{sec:resolucao}
@@ -1356,6 +1393,24 @@ initial = ((1,1),0)
 wrap = p2
 \end{code}
 
+Por fim, apresentamos alguns testes do ganho de eficiência entre as duas versões. 
+Tempo do cálculo dos resultados da versão inicial:
+
+\begin{itemize} 
+  \item |f a b c 10| - 0.01s
+  \item |f a b c 20| - 0.21s
+  \item |f a b c 30| - 79.16s
+\end{itemize}
+
+Tempo do cálculo dos resultados da nova versão com recursividade mútua:
+\begin{itemize} 
+  \item |fbl a b c 1| - 0.01s
+  \item |fbl a b c 2| - 0.01s
+  \item |fbl a b c 3| - 0.01s
+\end{itemize}
+
+A primeira versão a média dos tempos é igual a 26.46s e a nova a média dos tempos é igual a 0.01s, traduzindo-se em um ganho de 264 600 \%.
+
 \subsection*{Problema 2}
 
 De forma a resolvermos o problema 2 é necessário recorrer ao seguinte diagrama de um anamorfismo:
@@ -1548,11 +1603,11 @@ Nesta fase do problema 3, surge uma nova abordagem ao problema. Para explicar es
 
 Desta forma o resultado final, pode ser representado por este hilomorfismo:
 
-% \begin{spec}
-% constructSierp ::Int -> IO [()]
+\begin{spec}
+constructSierp ::Int -> IO [()]
 
-% constructSierp = present · carpets
-% \end{spec}
+constructSierp = present · carpets
+\end{spec}
 
 Com base na útlima abordagem conseguimos perceber, que iremos ter duas funções: a carpets e a present.
 A função carpets recebe como input um inteiro, que representa a profundidade N e devolve uma lista de lista de Squares, que representam os tapetes de profundidade 0 
@@ -1618,9 +1673,9 @@ argumentos a função gsCriteria que mediante um certo critério, calcula o resu
 A função encontra-se definida em baixo.
 
 \begin{code}
-matchResult gsCriteria (t1,t2) = if gsCriteria (t1,t2) == Just t1 then [(t1,3),(t2,0)]
-                                 else if gsCriteria (t1,t2) == Just t2 then [(t1,0),(t2,3)]
-                                 else [(t1,1),(t2,1)]
+matchResult gsCriteria (t1,t2) | gsCriteria (t1,t2) == Just t1 = [(t1,3),(t2,0)]
+                               | gsCriteria (t1,t2) == Just t2 = [(t1,0),(t2,3)]
+                               | otherwise = [(t1,1),(t2,1)]
 \end{code}
 
 De seguida, foi nos pedido para definir a função pairup, em que generateMatches se baseia.
@@ -1643,10 +1698,11 @@ glt l = i2 (splitAt n l)
 
 O diagrama representativo do anamorfismo utilizado na função initKnockoutStage é o seguinte:
 
+
 \begin{eqnarray*}
 \xymatrix{
-    |LTree A| & & A -|- (|LTree A| \times |LTree A|) ^* \ar[ll]_{|inLTree|} \\
-    (A^*)\ar@@/_1.5pc/[rr]_{|glt|}\ar[u]^{|anaList gsq|} & A -|- (A^* \times A)^*\ar[u]_{|id + anaList glt + anaList glt|}
+  |LTree Team| & & Team + (|LTree Team| \times |LTree Team|)\ar@@/_1.2pc/[ll]_{|inLTree|} \\
+  Team^*\ar@@/_1.2pc/[rr]_{|glt|}\ar[u]^{|anaLTree glt|} & & Team + (Team^* \times Team^*)\ar[u]_{id + |anaLTree glt| \times |anaLTree glt|}
 }
 \end{eqnarray*}
 
