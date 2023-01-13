@@ -1614,16 +1614,16 @@ O diagrama representativo do catamorfismo utilizado na função consolidate' é 
 
 \begin{eqnarray*}
 \xymatrix@@C=3cm{
-    (S \times N_0)^*
+    (S \times N)^*
            \ar[d]_-{|cataList cgene|}
 &
-    1 + (S \times N_0) + (S \times N_0)^*
+    1 + (S \times N) + (S \times N)^*
            \ar[d]^{|id| + |id| \times |cataList cgene|}
            \ar[l]_-{|inList|}
 \\
-     (S \times N_0)^*
+     (S \times N)^*
 &
-     1 + (S \times N_0) \times (S \times N_0)^*
+     1 + (S \times N) \times (S \times N)^*
            \ar[l]^-{|cgene|}
 }
 \end{eqnarray*}
